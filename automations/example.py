@@ -1,3 +1,5 @@
+import time
+
 from core.automation import Automation
 
 
@@ -12,4 +14,7 @@ class ExampleAutomation(Automation):
 
     def run(self) -> None:
         print("\nExecutando automação de exemplo...")
+
+        time.sleep(2)
+
         print("Automação executada com sucesso!")
