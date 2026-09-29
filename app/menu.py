@@ -1,3 +1,4 @@
+from core.automation import Automation
 from core.registry import AutomationRegistry
 
 
@@ -17,13 +18,16 @@ class Menu:
 
         print("0. Sair")
 
-    def get_choice(self) -> int:
+    def get_selection(self) -> Automation | None:
         while True:
             try:
                 choice = int(input("\nEscolha uma opção: "))
 
-                if 0 <= choice <= len(self.registry.get_all()):
-                    return choice
+                if choice == 0:
+                    return None
+
+                if 1 <= choice <= len(self.registry.get_all()):
+                    return self.registry.get_by_index(choice - 1)
 
                 print("Opção inválida.")
 

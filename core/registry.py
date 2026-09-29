@@ -10,3 +10,6 @@ class AutomationRegistry:
 
     def get_all(self) -> list[Automation]:
         return self._automations.copy()
+
+    def get_by_index(self, index: int) -> Automation:
+        return self._automations[index]

@@ -14,13 +14,11 @@ def main():
     while True:
         menu.display()
 
-        choice = menu.get_choice()
+        automation = menu.get_selection()
 
-        if choice == 0:
+        if automation is None:
             print("\nEncerrando Python Switch Automate...")
             break
-
-        automation = registry.get_all()[choice - 1]
 
         runner.run(automation)
 
