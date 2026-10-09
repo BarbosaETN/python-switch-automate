@@ -45,3 +45,24 @@ def test_runner_handles_error():
     assert result.success is False
     assert isinstance(result.error, RuntimeError)
     assert str(result.error) == "Erro de teste."
+
+
+def test_runner_records_automation_name_when_error_occurs():
+    runner = AutomationRunner()
+    automation = FailingAutomation()
+
+    result = runner.run(automation)
+
+    assert result.automation_name == automation.name
+    assert result.success is False
+    assert result.error is not None
+
+
+def test_runner_records_duration_when_error_occurs():
+    runner = AutomationRunner()
+    automation = FailingAutomation()
+
+    result = runner.run(automation)
+
+    assert result.success is False
+    assert result.duration >= 0
