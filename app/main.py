@@ -1,12 +1,13 @@
+
 from app.menu import Menu
-from automations.example import ExampleAutomation
+from automations.register import register_automations
 from core.registry import AutomationRegistry
 from core.runner import AutomationRunner
 
 
 def main():
     registry = AutomationRegistry()
-    registry.register(ExampleAutomation())
+    register_automations(registry)
 
     runner = AutomationRunner()
     menu = Menu(registry)
