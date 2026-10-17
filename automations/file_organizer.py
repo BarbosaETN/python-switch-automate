@@ -12,7 +12,7 @@ class FileOrganizer(Automation):
         "Compactados": {".zip", ".rar", ".7z", ".tar", ".gz"},
     }
 
-    def __init__(self, folder: Path):
+    def __init__(self, folder: Path | None = None):
         self.folder = folder
 
     @property
@@ -43,5 +43,53 @@ class FileOrganizer(Automation):
                 f"O caminho '{self.folder}' não é uma pasta."
             )
 
+    def get_files(self) -> list[Path]:
+        self.validate_folder()
+
+        return [
+            item
+            for item in self.folder.iterdir()
+            if item.is_file()
+        ]
+
+    def create_category_folder(self, category: str) -> Path:
+        category_folder = self.folder / category
+        category_folder.mkdir(exist_ok=True)
+
+        return category_folder
+
+    def get_unique_destination(self, destination: Path, filename: str) -> Path:
+        target = destination / filename
+
+        if not target.exists():
+            return target
+
+        file = Path(filename)
+        counter = 1
+
+        while True:
+            new_name = f"{file.stem} ({counter}){file.suffix}"
+            target = destination / new_name
+
+            if not target.exists():
+                return target
+
+            counter += 1    
+
+    def move_file(self, file: Path, destination: Path) -> Path:
+        target = self.get_unique_destination(destination, file.name)
+        file.rename(target)
+
+        return target   
+
     def run(self) -> None:
-        pass
+        if self.folder is None:
+            folder_input = input("Digite o caminho da pasta: ")
+            self.folder = Path(folder_input)
+
+        files = self.get_files()
+
+        for file in files:
+            category = self.get_category(file)
+            destination = self.create_category_folder(category)
+            self.move_file(file, destination)
