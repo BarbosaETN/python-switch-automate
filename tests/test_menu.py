@@ -1,6 +1,8 @@
 from app.menu import Menu
 from automations.example import ExampleAutomation
 from core.registry import AutomationRegistry
+from automations.register import register_automations
+from automations.file_organizer import FileOrganizer
 
 
 def create_menu():
@@ -49,4 +51,30 @@ def test_get_selection_rejects_non_numeric_input(monkeypatch):
 
     result = menu.get_selection()
 
-    assert result is automation            
+    assert result is automation
+
+def test_menu_displays_file_organizer(capsys):
+    registry = AutomationRegistry()
+
+    register_automations(registry)
+
+    menu = Menu(registry)
+
+    menu.display()
+
+    captured = capsys.readouterr()
+
+    assert "Organizador de arquivos" in captured.out
+
+def test_menu_selects_file_organizer(monkeypatch):
+    registry = AutomationRegistry()
+
+    register_automations(registry)
+
+    monkeypatch.setattr("builtins.input", lambda _: "2")
+
+    menu = Menu(registry)
+
+    result = menu.get_selection()
+
+    assert isinstance(result, FileOrganizer)               

@@ -10,5 +10,6 @@ def test_register_automations():
 
     automations = registry.get_all()
 
-    assert len(automations) == 1
+    assert len(automations) == 2
     assert automations[0].name == "Automação de exemplo"
+    assert automations[1].name == "Organizador de arquivos"
