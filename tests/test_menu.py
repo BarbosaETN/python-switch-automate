@@ -77,4 +77,26 @@ def test_menu_selects_file_organizer(monkeypatch):
 
     result = menu.get_selection()
 
-    assert isinstance(result, FileOrganizer)               
+    assert isinstance(result, FileOrganizer)
+
+def test_file_organizer_can_be_selected_and_executed(monkeypatch, tmp_path):
+    file = tmp_path / "documento.pdf"
+    file.touch()
+
+    inputs = iter(["2", str(tmp_path)])
+
+    monkeypatch.setattr(
+        "builtins.input",
+        lambda _: next(inputs)
+    )
+
+    registry = AutomationRegistry()
+    register_automations(registry)
+
+    menu = Menu(registry)
+
+    organizer = menu.get_selection()
+
+    organizer.run()
+
+    assert (tmp_path / "Documentos" / "documento.pdf").exists()               

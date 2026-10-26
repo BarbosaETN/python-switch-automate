@@ -89,7 +89,12 @@ class FileOrganizer(Automation):
 
         files = self.get_files()
 
+        organized_count = 0
+
         for file in files:
             category = self.get_category(file)
             destination = self.create_category_folder(category)
             self.move_file(file, destination)
+            organized_count += 1
+
+        print(f"{organized_count} arquivos organizados com sucesso.")

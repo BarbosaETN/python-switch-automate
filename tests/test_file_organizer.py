@@ -272,4 +272,19 @@ def test_run_raises_error_for_invalid_folder(monkeypatch):
     organizer = FileOrganizer()
 
     with pytest.raises(FileNotFoundError):
-        organizer.run()    
+        organizer.run()
+
+def test_run_displays_number_of_organized_files(tmp_path, capsys):
+    document = tmp_path / "documento.pdf"
+    image = tmp_path / "foto.jpg"
+
+    document.touch()
+    image.touch()
+
+    organizer = FileOrganizer(tmp_path)
+
+    organizer.run()
+
+    captured = capsys.readouterr()
+
+    assert "2 arquivos organizados" in captured.out    
