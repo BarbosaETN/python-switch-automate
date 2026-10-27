@@ -287,4 +287,104 @@ def test_run_displays_number_of_organized_files(tmp_path, capsys):
 
     captured = capsys.readouterr()
 
-    assert "2 arquivos organizados" in captured.out    
+    assert "2 arquivos organizados" in captured.out
+
+def test_run_displays_organized_files(tmp_path, capsys):
+    document = tmp_path / "documento.pdf"
+    image = tmp_path / "foto.jpg"
+
+    document.touch()
+    image.touch()
+
+    organizer = FileOrganizer(tmp_path)
+
+    organizer.run()
+
+    captured = capsys.readouterr()
+
+    assert "documento.pdf → Documentos" in captured.out
+    assert "foto.jpg → Imagens" in captured.out
+
+def test_run_displays_message_when_folder_is_empty(tmp_path, capsys):
+    organizer = FileOrganizer(tmp_path)
+
+    organizer.run()
+
+    captured = capsys.readouterr()
+
+    assert "Nenhum arquivo encontrado para organizar." in captured.out
+
+def test_run_organizes_file_without_extension_as_other(tmp_path):
+    file = tmp_path / "README"
+    file.touch()
+
+    organizer = FileOrganizer(tmp_path)
+
+    organizer.run()
+
+    assert (tmp_path / "Outros" / "README").exists()
+    assert not file.exists()
+
+def test_run_raises_error_when_file_cannot_be_moved(monkeypatch, tmp_path):
+    file = tmp_path / "arquivo.pdf"
+    file.touch()
+
+    organizer = FileOrganizer(tmp_path)
+
+    def failing_move_file(file, destination):
+        raise OSError("Não foi possível mover o arquivo.")
+
+    monkeypatch.setattr(organizer, "move_file", failing_move_file)
+
+    with pytest.raises(OSError, match="Não foi possível mover o arquivo."):
+        organizer.run()
+
+def test_organize_file_moves_file_to_correct_category(tmp_path):
+    file = tmp_path / "foto.jpg"
+    file.touch()
+
+    organizer = FileOrganizer(tmp_path)
+
+    organizer.organize_file(file)
+
+    assert (tmp_path / "Imagens" / "foto.jpg").exists()
+    assert not file.exists()
+
+def test_organize_file_handles_duplicate_name(tmp_path):
+    file = tmp_path / "foto.jpg"
+    file.touch()
+
+    images_folder = tmp_path / "Imagens"
+    images_folder.mkdir()
+
+    existing_file = images_folder / "foto.jpg"
+    existing_file.touch()
+
+    organizer = FileOrganizer(tmp_path)
+
+    organizer.organize_file(file)
+
+    assert existing_file.exists()
+    assert (images_folder / "foto (1).jpg").exists()
+    assert not file.exists()
+
+def test_organize_file_moves_unknown_file_to_other(tmp_path):
+    file = tmp_path / "arquivo.xyz"
+    file.touch()
+
+    organizer = FileOrganizer(tmp_path)
+
+    organizer.organize_file(file)
+
+    assert (tmp_path / "Outros" / "arquivo.xyz").exists()
+    assert not file.exists()
+
+def test_organize_file_returns_destination(tmp_path):
+    file = tmp_path / "foto.jpg"
+    file.touch()
+
+    organizer = FileOrganizer(tmp_path)
+
+    result = organizer.organize_file(file)
+
+    assert result == tmp_path / "Imagens" / "foto.jpg"                                    

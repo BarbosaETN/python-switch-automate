@@ -80,7 +80,16 @@ class FileOrganizer(Automation):
         target = self.get_unique_destination(destination, file.name)
         file.rename(target)
 
-        return target   
+        return target 
+
+    def organize_file(self, file: Path) -> Path:
+        category = self.get_category(file)
+        destination = self.create_category_folder(category)
+        target = self.move_file(file, destination)
+
+        print(f"{file.name} → {category}")
+
+        return target  
 
     def run(self) -> None:
         if self.folder is None:
@@ -89,12 +98,14 @@ class FileOrganizer(Automation):
 
         files = self.get_files()
 
+        if not files:
+            print("Nenhum arquivo encontrado para organizar.")
+            return
+
         organized_count = 0
 
         for file in files:
-            category = self.get_category(file)
-            destination = self.create_category_folder(category)
-            self.move_file(file, destination)
+            self.organize_file(file)
             organized_count += 1
 
         print(f"{organized_count} arquivos organizados com sucesso.")
